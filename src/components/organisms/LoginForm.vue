@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Form } from 'ant-design-vue';
 import FormItem from '@/components/molecules/FormItem.vue';
 import InputField from '@/components/atoms/InputField.vue';
 import PasswordField from '@/components/atoms/PasswordField.vue';
@@ -43,9 +42,7 @@ const handleSubmit = () => {
       <form-item label="Mật khẩu" name="password" :rules="rules.password">
         <password-field v-model:value="formData.password" />
       </form-item>
-      <form-item>
-        <submit-button :loading="loading" />
-      </form-item>
+      <submit-button :loading="loading" />
       <div class="register-link">
         Chưa có tài khoản?
         <router-link to="/register">Đăng ký ngay</router-link>

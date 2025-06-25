@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import RegisterForm from '@/components/organisms/RegisterForm.vue';
 import AuthLayout from '@/components/templates/AuthLayout.vue';
+import Header from '@/components/organisms/Header.vue';
 </script>
 
 <template>
+  <Header />
   <auth-layout>
     <h1>Đăng Ký</h1>
     <register-form />

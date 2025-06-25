@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Input } from 'ant-design-vue';
-
 defineProps<{
   value: string;
 }>();
@@ -14,7 +12,7 @@ defineEmits<{
   <a-input-password
     :value="value"
     placeholder="Enter password"
-    @input="$emit('update:value', $event.target.value)"
+    @input="$emit('update:value', $event.target.value ?? '')"
   />
 </template>
 

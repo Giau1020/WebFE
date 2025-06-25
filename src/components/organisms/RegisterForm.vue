@@ -81,13 +81,13 @@ const handleSubmit = () => {
         :rules="rules.birthDate"
       >
         <date-picker-field
-          v-model:value="formData.birthDate"
+          v-model:modelValue="formData.birthDate"
           placeholder="Chọn ngày sinh"
         />
       </form-item>
       <form-item label="Giới tính" name="gender" :rules="rules.gender">
         <select-field
-          v-model:value="formData.gender"
+          v-model:modelValue="formData.gender"
           placeholder="Chọn giới tính"
         >
           <a-select-option value="Nam">Nam</a-select-option>
@@ -97,9 +97,7 @@ const handleSubmit = () => {
       <form-item label="CMND/CCCD" name="CCCD" :rules="rules.CCCD">
         <input-field v-model:value="formData.CCCD" />
       </form-item>
-      <form-item>
-        <submit-button :loading="loading" />
-      </form-item>
+      <submit-button :loading="loading" />
       <div class="register-link">
         Đã có tài khoản? <router-link to="/login">Đăng nhập ngay</router-link>
       </div>

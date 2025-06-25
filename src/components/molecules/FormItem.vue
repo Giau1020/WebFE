@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Form } from 'ant-design-vue';
-
 defineProps<{
   label: string;
   name: string;
