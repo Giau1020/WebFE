@@ -1,8 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Table from './components/molecules/Table.vue';
+</script>
 
 <template>
   <div class="app">
-    <router-view />
+    <!-- <router-view /> -->
+    <Table />
   </div>
 </template>
 

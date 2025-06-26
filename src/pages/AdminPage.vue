@@ -4,7 +4,6 @@
     <div class="main-content">
       <Sidebar class="sidebar" />
       <div class="content">
-        <HeaderAppointment />
         <router-view />
       </div>
     </div>
