@@ -27,10 +27,10 @@ const handleChange = (value: string) => {
 
 <template>
   <a-select
-    v-model:value="internalValue"
+    v-model:value?="internalValue"
     :placeholder="placeholder || 'Chọn giá trị'"
     style="width: 100%; height: 50px"
-    @change="handleChange"
+    @change?="handleChange"
   >
     <slot></slot>
     <!-- Slot để truyền options từ component cha -->

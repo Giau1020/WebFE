@@ -1,114 +1,151 @@
 <template>
-  <a-table
-    :data-source="store.patients"
-    :columns="columns"
-    :row-selection="rowSelection"
-    :loading="store.loading"
-  >
-    <template #headerCell="{ column }">
-      <template v-if="column.key === 'name'">
-        <span style="color: #1890ff">Name</span>
-      </template>
-    </template>
-    <template #customFilterDropdown="slotProps">
-      <FilterDropdownMolecule
-        v-bind="slotProps"
-        :data-index="slotProps.column.dataIndex"
-        @search="handleSearch"
-        @reset="handleReset"
-      />
-    </template>
-    <template #customFilterIcon="{ filtered }">
-      <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
-    </template>
-    <template #bodyCell="{ text, column, record }">
-      <template
-        v-if="
-          column.key === 'name' &&
-          state.searchText &&
-          state.searchedColumn === column.dataIndex
-        "
+  <div>
+    <div v-if="selectedRowKeys.length > 0" style="margin-bottom: 16px">
+      <a-button
+        type="primary"
+        danger
+        @click="showBatchDeleteConfirm"
+        :disabled="!selectedRowKeys.length"
       >
-        <span>
-          <AvatarAtom :src="record.avatar" />
-          <template
-            v-for="(fragment, i) in text
-              .toString()
-              .split(
-                new RegExp(
-                  `(?<=${state.searchText})|(?=${state.searchText})`,
-                  'i'
-                )
-              )"
-          >
-            <mark
-              v-if="fragment.toLowerCase() === state.searchText.toLowerCase()"
-              :key="i"
-              class="highlight"
-            >
-              {{ fragment }}
-            </mark>
-            <template v-else>{{ fragment }}</template>
-          </template>
-        </span>
+        <DeleteOutlined /> Xóa Hàng Loạt ({{ selectedRowKeys.length }})
+      </a-button>
+      <a-button
+        type="primary"
+        style="margin-left: 8px"
+        @click="showBatchEditModal"
+        :disabled="!selectedRowKeys.length"
+      >
+        <EditOutlined /> Chỉnh Sửa Hàng Loạt ({{ selectedRowKeys.length }})
+      </a-button>
+    </div>
+    <a-table
+      :data-source="store.patients"
+      :columns="columns"
+      :row-selection="rowSelection"
+      :loading="store.loading"
+    >
+      <template #headerCell="{ column }">
+        <template v-if="column.key === 'name'">
+          <span style="color: #1890ff">Name</span>
+        </template>
       </template>
-      <template v-else-if="column.key === 'name'">
-        <AvatarAtom :src="record.avatar" />
-        {{ text }}
+      <template #customFilterDropdown="slotProps">
+        <FilterDropdownMolecule
+          v-bind="slotProps"
+          :data-index="slotProps.column.dataIndex"
+          @search="handleSearch"
+          @reset="handleReset"
+        />
       </template>
-      <template v-else-if="column.key === 'status'">
-        <a-tag :color="text === 'Active' ? 'green' : 'red'">{{ text }}</a-tag>
+      <template #customFilterIcon="{ filtered }">
+        <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
       </template>
-      <template v-else-if="column.key === 'edit'">
-        <ButtonAtom type="link" @click="showModal(record)"
-          ><EditOutlined
-        /></ButtonAtom>
-      </template>
-      <template v-else-if="column.key === 'delete'">
-        <a-popconfirm
-          title="Are you sure?"
-          ok-text="Yes"
-          cancel-text="No"
-          @confirm="handleDelete(record)"
+      <template #bodyCell="{ text, column, record }">
+        <template
+          v-if="
+            column.key === 'name' &&
+            state.searchText &&
+            state.searchedColumn === column.dataIndex
+          "
         >
-          <ButtonAtom type="link" danger><DeleteOutlined /></ButtonAtom>
-        </a-popconfirm>
+          <span>
+            <AvatarAtom :src="record.avatar" />
+            <template
+              v-for="(fragment, i) in text
+                .toString()
+                .split(
+                  new RegExp(
+                    `(?<=${state.searchText})|(?=${state.searchText})`,
+                    'i'
+                  )
+                )"
+            >
+              <mark
+                v-if="fragment.toLowerCase() === state.searchText.toLowerCase()"
+                :key="i"
+                class="highlight"
+              >
+                {{ fragment }}
+              </mark>
+              <template v-else>{{ fragment }}</template>
+            </template>
+          </span>
+        </template>
+        <template v-else-if="column.key === 'name'">
+          <AvatarAtom :src="record.avatar" />
+          {{ text }}
+        </template>
+        <template v-else-if="column.key === 'status'">
+          <a-tag :color="text === 'Active' ? 'green' : 'red'">{{ text }}</a-tag>
+        </template>
+        <template v-else-if="column.key === 'edit'">
+          <ButtonAtom type="link" @click="showModal(record)">
+            <EditOutlined />
+          </ButtonAtom>
+        </template>
+        <template v-else-if="column.key === 'delete'">
+          <a-popconfirm
+            title="Are you sure?"
+            ok-text="Yes"
+            cancel-text="No"
+            @confirm="handleDelete(record)"
+          >
+            <ButtonAtom type="link" danger>
+              <DeleteOutlined />
+            </ButtonAtom>
+          </a-popconfirm>
+        </template>
+        <template v-else>{{ text }}</template>
       </template>
-      <template v-else>{{ text }}</template>
-    </template>
-  </a-table>
-  <a-modal
-    v-model:open="open"
-    :title="`Edit ${selectedRecord?.name || 'Record'}`"
-    @ok="handleOk"
-  >
-    <a-form :model="formState" @finish="handleUpdate">
-      <a-form-item label="Name">
-        <a-input v-model:value="formState.name" />
-      </a-form-item>
-      <a-form-item label="Birth Date">
-        <a-input v-model:value="formState.birthDate" />
-      </a-form-item>
-      <a-form-item label="Status">
-        <a-select v-model:value="formState.status">
-          <a-select-option value="Active">Active</a-select-option>
-          <a-select-option value="Inactive">Inactive</a-select-option>
-        </a-select>
-      </a-form-item>
-    </a-form>
-  </a-modal>
+    </a-table>
+    <a-modal
+      v-model:open="open"
+      :title="`Edit ${selectedRecord?.name || 'Record'}`"
+      @ok="handleOk"
+    >
+      <a-form :model="formState" @finish="handleUpdate">
+        <a-form-item label="Name">
+          <a-input v-model:value="formState.name" />
+        </a-form-item>
+        <a-form-item label="Birth Date">
+          <a-input v-model:value="formState.birthDate" />
+        </a-form-item>
+        <a-form-item label="Status">
+          <a-select v-model:value="formState.status">
+            <a-select-option value="Active">Active</a-select-option>
+            <a-select-option value="Inactive">Inactive</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal
+      v-model:open="batchEditOpen"
+      title="Chỉnh Sửa Hàng Loạt"
+      @ok="handleBatchEditOk"
+    >
+      <a-form :model="batchFormState" @finish="handleBatchUpdate">
+        <a-form-item label="Status">
+          <a-select v-model:value="batchFormState.status">
+            <a-select-option value="Active">Active</a-select-option>
+            <a-select-option value="Inactive">Inactive</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref, defineProps, defineEmits, watch } from 'vue';
-import AvatarAtom from './AvatarAtom.vue';
-import ButtonAtom from './ButtonAtom.vue';
+import AvatarAtom from '../newatom/AvatarAtom.vue';
+import ButtonAtom from '../newatom/ButtonAtom.vue';
 import {
   SearchOutlined,
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons-vue';
 import { usePatientStore } from '@/stores/patientStore';
+import { message } from 'ant-design-vue';
 
 const props = defineProps<{
   columns: any[];
@@ -121,10 +158,12 @@ const state = reactive({
   searchText: '',
   searchedColumn: '',
 });
-const searchInput = ref();
 const open = ref<boolean>(false);
+const batchEditOpen = ref<boolean>(false);
 const selectedRecord = ref<any>(null);
 const formState = ref<any>({});
+const batchFormState = ref<any>({ status: 'Active' });
+const selectedRowKeys = ref<any[]>([]);
 
 watch(
   () => selectedRecord.value,
@@ -133,6 +172,15 @@ watch(
   },
   { immediate: true }
 );
+
+// Update rowSelection to track selected rows
+const rowSelection = computed(() => ({
+  ...props.rowSelection,
+  onChange: (keys: any[]) => {
+    selectedRowKeys.value = keys;
+    props.rowSelection?.onChange?.(keys);
+  },
+}));
 
 const handleSearch = (selectedKeys: any) => {
   state.searchText = selectedKeys[0];
@@ -165,6 +213,38 @@ const handleUpdate = () => {
 
 const handleDelete = (record: any) => {
   store.deletePatient(record.key);
+};
+
+const showBatchDeleteConfirm = () => {
+  aModal.confirm({
+    title: `Bạn có chắc muốn xóa ${selectedRowKeys.value.length} bệnh nhân?`,
+    content: 'Hành động này không thể hoàn tác.',
+    okText: 'Xóa',
+    okType: 'danger',
+    cancelText: 'Hủy',
+    onOk() {
+      store.batchDeletePatients(selectedRowKeys.value);
+      selectedRowKeys.value = [];
+      message.success('Đã xóa các bệnh nhân được chọn');
+    },
+  });
+};
+
+const showBatchEditModal = () => {
+  batchEditOpen.value = true;
+};
+
+const handleBatchEditOk = () => {
+  batchEditOpen.value = false;
+};
+
+const handleBatchUpdate = () => {
+  store.updatePatient(selectedRowKeys.value, {
+    status: batchFormState.value.status,
+  });
+  batchEditOpen.value = false;
+  selectedRowKeys.value = [];
+  message.success('Đã cập nhật trạng thái cho các bệnh nhân được chọn');
 };
 </script>
 

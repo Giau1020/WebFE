@@ -9,9 +9,9 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import TableOrganism from './TableOrganism.vue';
+import TableOrganism from '../organisms/TableOrganism.vue';
 import { usePatientStore } from '@/stores/patientStore';
-import ButtonAtom from './ButtonAtom.vue';
+import ButtonAtom from '../newatom/ButtonAtom.vue';
 
 const store = usePatientStore();
 const columns = [

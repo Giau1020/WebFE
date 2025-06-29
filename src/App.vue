@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import Table from './components/molecules/Table.vue';
+import Table from '@/component2/Templates/Patientlayout.vue';
+import AdminPage from './pages/AdminPage.vue';
 </script>
 
 <template>
   <div class="app">
     <!-- <router-view /> -->
-    <Table />
+    <!-- <Table /> -->
+    <AdminPage>
+      <Table />
+    </AdminPage>
   </div>
 </template>
 

@@ -3,8 +3,9 @@
     <Header class="header" />
     <div class="main-content">
       <Sidebar class="sidebar" />
-      <div class="content">
+      <div class="content" :class="{ 'no-padding': isDashboard }">
         <router-view />
+        <Slot />
       </div>
     </div>
   </div>
@@ -13,6 +14,11 @@
 <script setup lang="ts">
 import Header from '@/components/organisms/Header.vue';
 import Sidebar from '@/components/atoms/Sidebar.vue';
+
+const route = useRoute();
+
+/* /dashboard → true  (đổi sang startsWith nếu có child-route) */
+const isDashboard = computed(() => route.path === '/dashboard');
 </script>
 
 <style scoped>
@@ -42,6 +48,10 @@ import Sidebar from '@/components/atoms/Sidebar.vue';
 .content {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
+  height: 100%;
+  overflow: auto;
+}
+.content.no-padding {
+  padding: 10px;
 }
 </style>

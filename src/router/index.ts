@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '@/pages/LoginPage.vue';
 import RegisterPage from '@/pages/RegisterPage.vue';
 import AdminPage from '@/pages/AdminPage.vue';
+import Table from '@/component2/Templates/Patientlayout.vue';
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminPage,
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Table,
   },
   {
     path: '/',

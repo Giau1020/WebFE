@@ -1,94 +1,182 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import axios from 'axios';
+import type { Dayjs } from 'dayjs';
 
-export const usePatientStore = defineStore('patients', () => {
-  const patients = ref([]);
-  const loading = ref(false);
-  const error = ref(null);
+export interface Patient {
+  key: string; // ID duy nhất của bệnh nhân
+  name: string; // Họ và tên
+  username: string; // Tên đăng nhập
+  dob: string | Dayjs | null; // Ngày tháng năm sinh (chuỗi hoặc Dayjs)
+  bloodGroup: string; // Nhóm máu (A+, A-, B+, ...)
+  gender: string; // Giới tính (Male, Female, Other)
+  cccd: string; // Số CCCD/CMND
+  status: string; // Trạng thái (ví dụ: Active, Inactive)
+  date: string; // Ngày (có thể là ngày nhập viện hoặc khác)
+  password: string; // Số bảo hiểm
+}
 
-  const fetchPatients = async () => {
-    loading.value = true;
-    try {
-      const response = await axios.get(
-        'https://jsonplaceholder.typicode.com/users'
+export const usePatientStore = defineStore('patient', {
+  state: (): { patients: Patient[]; selectedRowKeys: string[] } => ({
+    patients: [
+      {
+        key: '1',
+        name: 'Grand Rapids',
+        date: '11:30 AM 02 Sep 2024',
+        password: 'PYBJ89RW',
+        status: 'Ext. Hospitalism',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '2',
+        name: 'Bell Gardens',
+        date: '10:30 AM 01 Sep 2024',
+        password: 'WA3A4U3C',
+        status: 'In Surgery',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '3',
+        name: 'Broomfield',
+        date: '12:30 PM 30 Aug 2024',
+        password: 'RX10QYE0',
+        status: 'Discharge',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '4',
+        name: 'Yakima',
+        date: '10:00 AM 29 Aug 2024',
+        password: 'QZXXJHT5',
+        status: 'Expected Stay',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '5',
+        name: 'Springfield',
+        date: '11:00 AM 29 Aug 2024',
+        password: 'IT5H6I2R',
+        status: 'Ext. Hospitalism',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '6',
+        name: 'Alexandria',
+        date: '11:30 AM 29 Aug 2024',
+        password: 'WA3A4U3C',
+        status: 'Discharge',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '7',
+        name: 'Kalamazoo',
+        date: '12:30 PM 29 Aug 2024',
+        password: 'IT5H6I2R',
+        status: 'Ext. Hospitalism',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '8',
+        name: 'Grand Rapids',
+        date: '01:30 PM 29 Aug 2024',
+        password: 'FUJY920J',
+        status: 'In Surgery',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '9',
+        name: 'Bell Gardens',
+        date: '02:30 PM 29 Aug 2024',
+        password: 'QZXXJHT5',
+        status: 'Discharge',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '10',
+        name: 'Broomfield',
+        date: '04:30 PM 29 Aug 2024',
+        password: 'FUJY920J',
+        status: 'Ext. Hospitalism',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+      {
+        key: '11',
+        name: 'Broomfield',
+        date: '04:30 PM 29 Aug 2024',
+        password: 'FUJY920J',
+        status: 'Ext. Hospitalism',
+        username: '',
+        dob: null,
+        bloodGroup: '',
+        gender: '',
+        cccd: '',
+      },
+    ],
+    selectedRowKeys: [],
+  }),
+  actions: {
+    addPatient(patient: Patient) {
+      this.patients.push(patient);
+    },
+    deletePatient(key: string) {
+      this.patients = this.patients.filter((p) => p.key !== key);
+    },
+    deleteSelectedPatients() {
+      this.patients = this.patients.filter(
+        (p) => !this.selectedRowKeys.includes(p.key)
       );
-      patients.value = response.data.map((item: any) => ({
-        key: item.id,
-        name: item.name,
-        birthDate: `1990-01-01`, // Giả lập
-        status: Math.random() > 0.5 ? 'Active' : 'Inactive',
-        avatar: `https://via.placeholder.com/100?text=${item.name}`,
-      }));
-      error.value = null;
-    } catch (err) {
-      error.value = (err as Error).message;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const addPatient = async (patient: any) => {
-    loading.value = true;
-    try {
-      const response = await axios.post(
-        'https://jsonplaceholder.typicode.com/users',
-        patient
-      );
-      const newPatient = response.data;
-      patients.value.push({
-        key: newPatient.id,
-        name: newPatient.name,
-        birthDate: patient.birthDate || '1990-01-01',
-        status: patient.status || 'Active',
-        avatar: `https://via.placeholder.com/100?text=${newPatient.name}`,
-      });
-      error.value = null;
-    } catch (err) {
-      error.value = (err as Error).message;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const updatePatient = async (patient: any) => {
-    loading.value = true;
-    try {
-      await axios.put(
-        `https://jsonplaceholder.typicode.com/users/${patient.key}`,
-        patient
-      );
-      const index = patients.value.findIndex((p: any) => p.key === patient.key);
-      if (index !== -1)
-        patients.value[index] = { ...patients.value[index], ...patient };
-      error.value = null;
-    } catch (err) {
-      error.value = (err as Error).message;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const deletePatient = async (key: number) => {
-    loading.value = true;
-    try {
-      await axios.delete(`https://jsonplaceholder.typicode.com/users/${key}`);
-      patients.value = patients.value.filter((p: any) => p.key !== key);
-      error.value = null;
-    } catch (err) {
-      error.value = (err as Error).message;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  return {
-    patients,
-    loading,
-    error,
-    fetchPatients,
-    addPatient,
-    updatePatient,
-    deletePatient,
-  };
+      this.selectedRowKeys = [];
+    },
+    editPatient(patient: Patient) {
+      const index = this.patients.findIndex((p) => p.key === patient.key);
+      if (index !== -1) {
+        this.patients[index] = { ...this.patients[index], ...patient };
+      }
+    },
+    setSelectedRowKeys(keys: string[]) {
+      this.selectedRowKeys = keys; // Giới hạn 5 bệnh nhân
+    },
+  },
+  getters: {
+    getPatients: (state) => state.patients,
+    getSelectedRowKeys: (state) => state.selectedRowKeys, // Trả về mảng gốc
+  },
 });
